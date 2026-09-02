@@ -1,31 +1,38 @@
 class Solution {
-    public boolean isPalin(String s){
-        String s2 = new StringBuilder(s).reverse().toString();
-        
-        return s.equals(s2);
+    private boolean isPalin(String s ,int left,int right){
+        while(left<right){
+            if(s.charAt(left) != s.charAt(right)){
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
     }
-    public void getAllParts(String s,List<String> partitions,List<List<String>> ans){
-        if(s.length() == 0){
-            ans.add(new ArrayList<>(partitions));
+
+    private void backtrack(String s, int start,List<String> curr,List<List<String>> ans){
+        if(start == s.length()){
+            ans.add(new ArrayList<>(curr));
             return;
         }
-        for(int i =0;i<s.length();i++){
-            String part = s.substring(0,i+1);
-
-            if(isPalin(part)){
-                partitions.add(part);
-                getAllParts(s.substring(i+1),partitions,ans);
-                partitions.remove(partitions.size()-1);
+        for(int end = start;end <s.length();end++){
+            if(isPalin(s,start,end)){
+                curr.add(s.substring(start,end+1));
+                backtrack(s,end+1,curr,ans);
+                curr.remove(curr.size()-1);
             }
         }
     }
 
+
+
     public List<List<String>> partition(String s) {
+        List<String> curr = new ArrayList<>();
         List<List<String>> ans = new ArrayList<>();
-        List<String> partitions = new ArrayList<>();
 
-        getAllParts(s,partitions,ans);
-        return ans ;
+        backtrack(s,0,curr,ans);
+
+        return ans;
+
     }
-
 }
