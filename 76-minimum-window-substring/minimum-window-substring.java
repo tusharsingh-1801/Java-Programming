@@ -1,106 +1,36 @@
 class Solution {
-
-    private boolean containsPatternInWindow(
-        String text,
-        String pattern,
-        int windowLen,
-        int[] startRef
-    ) {
-
-        int[] freq = new int[256];
-        int uniqueChars = 0;
-
-        
-        for(char ch : pattern.toCharArray()){
-
-            if(freq[ch] == 0){
-                uniqueChars++;
-            }
-
-            freq[ch]++;
-        }
-
-        int matched = 0;
-
-        for(int i = 0; i < text.length(); i++){
-
-            char currentChar = text.charAt(i);
-
-            freq[currentChar]--;
-
-            if(freq[currentChar] == 0){
-                matched++;
-            }
-
-            
-            if(i >= windowLen){
-
-                char leftChar = text.charAt(i - windowLen);
-
-                freq[leftChar]++;
-
-                if(freq[leftChar] == 1){
-                    matched--;
-                }
-            }
-
-          
-            if(i >= windowLen - 1 && matched == uniqueChars){
-
-                startRef[0] = i - windowLen + 1;
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
     public String minWindow(String s, String t) {
+        int[] target = new int[256];
 
-        int sLen = s.length();
-        int tLen = t.length();
-
-        if(sLen < tLen){
-            return "";
+        for(char ch : t.toCharArray()){
+            target[ch]++;
         }
+        int n =s.length();
+        int i=0,j=0;
+        int count =0;
+        int required = t.length();
+        int start =0;
+        int minLength = Integer.MAX_VALUE;
 
-        int left = tLen;
-        int right = sLen;
-
-        int minWindowLen = Integer.MAX_VALUE;
-        int windowStartIndex = -1;
-
-        while(left <= right){
-
-            int mid = (left + right) / 2;
-
-            int[] currentStart = new int[1];
-
-            if(containsPatternInWindow(s, t, mid, currentStart)){
-
-                if(mid < minWindowLen){
-
-                    minWindowLen = mid;
-                    windowStartIndex = currentStart[0];
-                }
-
-            
-                right = mid - 1;
-
-            } else {
-
-                
-                left = mid + 1;
+        while(j<n){
+            if(target[s.charAt(j)]>0){
+                count++;
             }
-        }
+            target[s.charAt(j)]--;
 
-        return windowStartIndex == -1
-            ? ""
-            : s.substring(
-                windowStartIndex,
-                windowStartIndex + minWindowLen
-            );
+            while(count == required){
+                if(minLength > j-i+1){
+                    minLength = j-i+1;
+                    start = i;
+                }
+                target[s.charAt(i)]++;
+                if(target[s.charAt(i)]>0){
+                    count--;
+                }
+                i++;
+            }
+            j++;
+        }
+        return (minLength == Integer.MAX_VALUE)?"":s.substring(start,start+minLength);
     }
 }
